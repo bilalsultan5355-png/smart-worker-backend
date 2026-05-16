@@ -54,18 +54,25 @@ const onlineUsers = new Map();
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  // User join karta hai apni ID ke saath
   socket.on('join', (userId) => {
     onlineUsers.set(userId, socket.id);
     console.log(`User ${userId} joined`);
   });
 
-  // Message send karna
   socket.on('sendMessage', (data) => {
     const { receiverId, message } = data;
     const receiverSocketId = onlineUsers.get(receiverId);
     if (receiverSocketId) {
       io.to(receiverSocketId).emit('receiveMessage', message);
+    }
+  });
+
+  // Location share karna
+  socket.on('shareLocation', (data) => {
+    const { receiverId, location } = data;
+    const receiverSocketId = onlineUsers.get(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit('receiveLocation', location);
     }
   });
 
